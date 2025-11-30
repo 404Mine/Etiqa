@@ -43,7 +43,7 @@ namespace EmployeeAPI.Controllers
             var vm = new EmployeeReadViewModel
             {
                 EmployeeNumber = employee.EmployeeNumber,
-                FullName = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}",
+                FullName = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}".Trim(),
                 DateOfBirth = employee.DateOfBirth,
                 DailyRate = employee.DailyRate,
                 WorkingDays = employee.WorkingDays
