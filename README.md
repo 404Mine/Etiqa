@@ -5,7 +5,7 @@ The code works by opening the sln file and then clicking run.
 I configured it to run both backend and frontend at the same time
 Removed swagger browser launch for backend after successful integration of UI to API
 
-============================================================================================
+===========================================================================
 
 
 How the code works
