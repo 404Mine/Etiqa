@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmployeeAPI", "EmployeeAPI\EmployeeAPI.csproj", "{DD844BE1-0BBD-4F1B-A4FC-8D3D8B506700}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmployeeUI", "..\EmployeeUI\EmployeeUI.csproj", "{6D49ECE0-A0A5-4CC7-B51D-A957945D1900}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DD844BE1-0BBD-4F1B-A4FC-8D3D8B506700}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD844BE1-0BBD-4F1B-A4FC-8D3D8B506700}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD844BE1-0BBD-4F1B-A4FC-8D3D8B506700}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D49ECE0-A0A5-4CC7-B51D-A957945D1900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D49ECE0-A0A5-4CC7-B51D-A957945D1900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D49ECE0-A0A5-4CC7-B51D-A957945D1900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D49ECE0-A0A5-4CC7-B51D-A957945D1900}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
