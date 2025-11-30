@@ -117,5 +117,12 @@ namespace EmployeeAPI.Controllers
             var total = _service.ComputeDailyRate();
             return Ok(new { totalDailyRate = total });
         }
+
+        [HttpGet("{employeeNumber}/takehome")]
+        public IActionResult GetTakeHomePay (string employeeNumber, DateTime start, DateTime end)
+        {
+            var pay = _service.ComputeTakeHomePay(employeeNumber, start, end);
+            return Ok(new { EmployeeNumber = employeeNumber, TakeHomePay = pay });
+        }
     }
 }

@@ -70,5 +70,16 @@ namespace EmployeeAPI.Services
 
         //Computation
         public decimal ComputeDailyRate() => _context.Employees.Sum(e => e.DailyRate);
+
+        public decimal ComputeTakeHomePay(string employeeNumber, DateTime startDate, DateTime endDate)
+        {
+            var employee = _context.Employees.Find(employeeNumber);
+            if (employee == null) return 0m;
+
+            // Include all days in the period
+            int totalDays = (endDate.Date - startDate.Date).Days + 1;
+
+            return totalDays * employee.DailyRate;
+        }
     }
 }
