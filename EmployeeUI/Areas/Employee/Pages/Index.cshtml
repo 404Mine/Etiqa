@@ -119,6 +119,11 @@
 <script>
     const apiUrl = "http://localhost:5129/api/employee";
 
+    let originalSubmitHandler = null; // store POST handler
+
+    // ================================
+    // Load Employees
+    // ================================
     async function loadEmployees() {
         const response = await fetch(apiUrl);
         const employees = await response.json();
@@ -134,8 +139,8 @@
                 <td>${emp.dailyRate}</td>
                 <td>${emp.workingDays}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm">Edit</button>
-                    <button class="btn btn-danger btn-sm">Delete</button>
+                    <button class="btn btn-warning btn-sm" onclick="editEmployee('${emp.employeeNumber}')">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.employeeNumber}')">Delete</button>
                 </td>
             </tr>`;
         });
@@ -143,7 +148,87 @@
 
     document.getElementById("loadBtn").addEventListener("click", loadEmployees);
 
-    document.getElementById("employeeForm").addEventListener("submit", async e => {
+    // ================================
+    // DELETE EMPLOYEE
+    // ================================
+    async function deleteEmployee(empNum) {
+        if (!confirm(`Are you sure you want to delete ${empNum}?`)) return;
+
+        const res = await fetch(`${apiUrl}/${empNum}`, { method: "DELETE" });
+        if (res.ok) {
+            alert("Employee deleted!");
+            loadEmployees();
+        } else {
+            alert("Error deleting employee");
+        }
+    }
+
+    // ================================
+    // EDIT EMPLOYEE
+    // ================================
+    async function editEmployee(empNum) {
+        const res = await fetch(`${apiUrl}/${empNum}`);
+        if (!res.ok) { alert("Error loading employee"); return; }
+
+        const emp = await res.json();
+        const { lastName, firstName, middleName } = splitFullName(emp.fullName);
+        // Prefill modal
+        document.getElementById("lastName").value = lastName;
+        document.getElementById("firstName").value = firstName;
+        document.getElementById("middleName").value = middleName;
+        document.getElementById("dob").value = emp.dateOfBirth.split('T')[0];
+        document.getElementById("dailyRate").value = emp.dailyRate;
+        document.getElementById("workingDays").value = emp.workingDays;
+
+        // Change modal title
+        document.getElementById("createModalLabel").innerText = "Edit Employee";
+
+        // Show modal
+        const modalEl = document.getElementById('createModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // Save original handler only once
+        if (!originalSubmitHandler) {
+            originalSubmitHandler = document.getElementById("employeeForm").onsubmit;
+        }
+
+        // Override handler with PUT update
+        document.getElementById("employeeForm").onsubmit = async e => {
+            e.preventDefault();
+
+            const updatedEmployee = {
+                lastName: document.getElementById("lastName").value,
+                firstName: document.getElementById("firstName").value,
+                middleName: document.getElementById("middleName").value,
+                dateOfBirth: document.getElementById("dob").value,
+                dailyRate: parseFloat(document.getElementById("dailyRate").value),
+                workingDays: document.getElementById("workingDays").value
+            };
+
+            const putRes = await fetch(`${apiUrl}/${empNum}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedEmployee)
+            });
+
+            if (putRes.ok) {
+                alert("Employee updated!");
+                loadEmployees();
+                modal.hide();
+
+                // restore POST handler
+                document.getElementById("employeeForm").onsubmit = originalSubmitHandler;
+            } else {
+                alert("Error updating employee");
+            }
+        };
+    }
+
+    // ================================
+    // CREATE EMPLOYEE (POST)
+    // ================================
+    document.getElementById("employeeForm").onsubmit = async e => {
         e.preventDefault();
 
         const employee = {
@@ -164,22 +249,39 @@
         if (res.ok) {
             alert("Employee created!");
             loadEmployees();
-            var modalEl = document.getElementById('createModal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
+            const modalEl = document.getElementById('createModal');
+            bootstrap.Modal.getInstance(modalEl).hide();
         } else {
             alert("Error creating employee");
         }
-    });
+    };
 
-    // ===== Take-Home Pay =====
+    function splitFullName(fullName) {
+        // Split into ["LastName", "FirstName MiddleName"]
+        const parts = fullName.split(",");
+
+        const lastName = parts[0].trim();
+        const rest = parts[1]?.trim() ?? "";
+
+        // Split remaining parts (can be 1 or 2 names)
+        const restParts = rest.split(" ");
+
+        const firstName = restParts[0] ?? "";
+        const middleName = restParts.slice(1).join(" ") ?? "";
+
+        return { lastName, firstName, middleName };
+    }
+
+    // ================================
+    // TAKE-HOME PAY
+    // ================================
     document.getElementById("computeTHPBtn").addEventListener("click", async () => {
         const empNum = document.getElementById("thpEmployeeNumber").value;
         const start = document.getElementById("thpStartDate").value;
         const end = document.getElementById("thpEndDate").value;
 
         if (!empNum || !start || !end) {
-            alert("Please fill in all fields.");
+            alert("Please complete all fields.");
             return;
         }
 
@@ -187,7 +289,6 @@
         if (res.ok) {
             const data = await res.json();
             alert(`Take-Home Pay for ${empNum}: PhP ${data.takeHomePay.toLocaleString()}`);
-
         } else {
             alert("Error computing take-home pay");
         }
