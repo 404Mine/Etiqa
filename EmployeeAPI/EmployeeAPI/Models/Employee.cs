@@ -1,7 +1,10 @@
-﻿namespace EmployeeAPI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EmployeeAPI.Models
 {
     public class Employee
     {
+        [Key]
         public string EmployeeNumber { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }

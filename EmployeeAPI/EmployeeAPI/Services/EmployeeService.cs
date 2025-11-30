@@ -1,45 +1,47 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using EmployeeAPI.Models;
+using EmployeeAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeAPI.Services
 {
     public class EmployeeService
     {
-        private readonly List<Employee> _employees = new();
-        private int _nextEmployeeNum = 1;
+        private readonly EmployeeDbContext _context;
+
+        public EmployeeService(EmployeeDbContext context)
+        {
+            _context = context;
+        }
 
         //Get Employees
-        public IEnumerable<Employee> GetAll()
-        {
-            return _employees;
-        }
+        public IEnumerable<Employee> GetAll() => _context.Employees.ToList();
 
         //Get Employee with EmpNum
-        public Employee? GetByNumber(int employeeNumber)
-        {
-            return _employees.FirstOrDefault(e => e.EmployeeNumber == employeeNumber);
-        }
+        public Employee? GetByNumber(string employeeNumber) =>
+            _context.Employees.FirstOrDefault(e => e.EmployeeNumber == employeeNumber);
 
         //Create Employee
         public Employee Create(Employee employee)
         {
+            // Generate EmployeeNumber
             string namePart = (employee.LastName.Length >= 3 ? employee.LastName.Substring(0, 3) : employee.LastName).ToUpper();
-
             Random rnd = new Random();
             int randNum = rnd.Next(0, 100000);
             string numberPart = randNum.ToString("D5");
-
             string dobPart = employee.DateOfBirth.ToString("ddMMMyyyy").ToUpper();
 
             employee.EmployeeNumber = $"{namePart}-{numberPart}-{dobPart}";
 
-            _employees.Add(employee);
+            _context.Employees.Add(employee);
+            _context.SaveChanges();
+
             return employee;
         }
 
         //Update Employee
-        public bool Update(int employeeNumber, Employee updatedEmployee)
+        public bool Update(string employeeNumber, Employee updatedEmployee)
         {
             var existing = GetByNumber(employeeNumber);
             if (existing == null) return false;
@@ -51,23 +53,22 @@ namespace EmployeeAPI.Services
             existing.DailyRate = updatedEmployee.DailyRate;
             existing.WorkingDays = updatedEmployee.WorkingDays;
 
+            _context.SaveChanges();
             return true;
         }
 
         //Delete Employee
-        public bool Delete(int employeeNumber)
+        public bool Delete(string employeeNumber)
         {
-            var existing = GetByNumber(_nextEmployeeNum);
+            var existing = GetByNumber(employeeNumber);
             if (existing == null) return false;
 
-            _employees.Remove(existing);
+            _context.Employees.Remove(existing);
+            _context.SaveChanges();
             return true;
         }
 
         //Computation
-        public decimal ComputeDailyRate()
-        {
-            return _employees.Sum(e => e.DailyRate);
-        }
+        public decimal ComputeDailyRate() => _context.Employees.Sum(e => e.DailyRate);
     }
 }

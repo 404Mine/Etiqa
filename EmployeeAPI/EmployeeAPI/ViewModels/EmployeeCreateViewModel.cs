@@ -4,7 +4,6 @@ namespace EmployeeAPI.ViewModels
 {
     public class EmployeeCreateViewModel
     {
-        public string EmployeeNumber { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
